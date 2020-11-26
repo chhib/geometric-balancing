@@ -1,18 +1,15 @@
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
-
-
 const functions = require('firebase-functions');
 const puppeteer = require('puppeteer');
 const html_table_to_json = require('html-table-to-json');
 const log = functions.logger.info;
 
+const runtimeOpts = {
+  timeoutSeconds: 300,
+  memory: '1GB'
+}
+
 exports.instrument_table = functions
+  .runWith(runtimeOpts)
   .region('europe-west1')
   .https.onRequest(async (req, res) => {
 
