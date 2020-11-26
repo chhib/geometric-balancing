@@ -14,10 +14,10 @@ exports.instrument_table = functions
   .region(region)
   .https.onRequest(async (req, res) => {
 
-  const { url, selector = '', validation_selector = '', ticker = '' } = req.query
+  const { url, selector = '', validation_selector = '', ticker = '-' } = req.query
 
   if (!url) {
-    return res.send(`Invalid url: ${url}`);
+    return res.status(500).send(`Invalid url: ${url}`);
   }
 
   const fetch_url = decodeURIComponent(url);
@@ -25,8 +25,8 @@ exports.instrument_table = functions
   const fetch_validation_selector = decodeURIComponent(validation_selector);
 
   // Serve from cache if less than 1 hour
-  if (cache[url] && cache[url].data.length > 0 && cache[url].ttl > new Date()) {
-    return res.json(cache[url]);
+  if (cache[ticker] && cache[ticker].ttl > new Date()) {
+    return res.json(cache[ticker]);
   }
 
   let browser;
@@ -46,14 +46,15 @@ exports.instrument_table = functions
     // Save to cache
 
     const ttl = new Date()
-    ttl.setHours(ttl.getHours() + 0.1);
-    cache[url] = {
-      data: json_table,
-      ttl: ttl,
-      ticker: ticker
+    ttl.setHours(ttl.getHours() + 1);
+    cache[ticker] = {
+      ttl,
+      ticker,
+      url: fetch_url,
+      data: json_table
     }
 
-    res.json(cache[url]);
+    res.json(cache[ticker]);
   } catch (e) {
     console.error('Caught Error: '+e);
     res.status(500).send(e);
