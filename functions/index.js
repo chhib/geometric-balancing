@@ -8,6 +8,10 @@ const runtimeOpts = {
   memory: '2GB'
 }
 const region = 'europe-west1'
+const cache = {
+  json_table: [],
+  ttl: new Date(),
+}
 
 exports.instrument_table = functions
   .runWith(runtimeOpts)
@@ -23,6 +27,12 @@ exports.instrument_table = functions
   url = decodeURIComponent(url);
   selector = decodeURIComponent(selector);
   validation_selector = decodeURIComponent(validation_selector);
+
+  log(cache);
+  if (cache.json_table.length > 0 && cache.ttl > new Date()) {
+    return res.json(cache.json_table);
+  }
+
 
   let browser;
   try {
@@ -44,6 +54,13 @@ exports.instrument_table = functions
     await page.waitForSelector(validation_selector || "instrumenthistory history table tbody > tr:nth-child(1) > td.cell-table__num");
     const html_table = await page.$eval(selector, e => e.outerHTML);
     const json_table = html_table_to_json.parse(html_table).results;
+      // Store fresh data in cache
+    cache.json_table = json_table
+    // Store a TTL for the data
+    const dateInOneHour = new Date()
+    dateInOneHour.setHours(dateInOneHour.getHours() + 1);
+    cache.ttl = dateInOneHour 
+
     
     //res.send(html_table)
     res.json(json_table);
