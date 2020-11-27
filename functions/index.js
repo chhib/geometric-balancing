@@ -24,8 +24,12 @@ exports.instrument_table = functions
   const fetch_selector = decodeURIComponent(selector);
   const fetch_validation_selector = decodeURIComponent(validation_selector);
 
+  // Allow everything
+  res.set('Access-Control-Allow-Origin', "*")
+  res.set('Access-Control-Allow-Methods', 'GET, POST')
+
   // Serve from cache if less than 1 hour
-  if (cache[ticker] && cache[ticker].ttl > new Date()) {
+  if (cache[ticker] && cache[ticker].expires > new Date()) {
     return res.json(cache[ticker]);
   }
 
@@ -48,10 +52,10 @@ exports.instrument_table = functions
     const ttl = new Date()
     ttl.setHours(ttl.getHours() + 1);
     cache[ticker] = {
-      ttl,
       ticker,
+      expires: ttl,
       url: fetch_url,
-      data: json_table
+      data: json_table.flat()
     }
 
     res.json(cache[ticker]);
