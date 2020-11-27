@@ -9,6 +9,11 @@ const runtimeOpts = {
 const region = 'europe-west1'
 const cache = {}
 
+
+//exports.instrument_json
+
+// `https://etp.morganstanley.com/SE/sv-SE/UnitedChart/ProductChartData?friendlyId=JE00BK9PZF59&period=OneYear&_=${new Date().getTime()}`
+
 exports.instrument_table = functions
   .runWith(runtimeOpts)
   .region(region)
@@ -68,3 +73,10 @@ exports.instrument_table = functions
     }
   }
 })
+
+
+
+
+
+// http://localhost:5001/geometric-balancing/europe-west1/instrument_table?ticker=xlnt&url=https%3A%2F%2Fhandelsbanken-marknadsinformation.se%2Fapp%2Finstrument%2FSHBSABTIi%2F2365%2FHistorik&selector=instrumenthistory%20history%20table&validation_selector=instrumenthistory%20history%20table%20td
+// https://europe-west1-geometric-balancing.cloudfunctions.net/instrument_table?ticker=xlnt&url=https%3A%2F%2Fhandelsbanken-marknadsinformation.se%2Fapp%2Finstrument%2FSHBSABTIi%2F2365%2FHistorik&selector=instrumenthistory%20history%20table&validation_selector=instrumenthistory%20history%20table%20td
